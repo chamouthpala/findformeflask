@@ -17,6 +17,19 @@ def uploadimage():
             "message": "Image Uploaded Successfully"
         })
 
+@app.route('/testurl', methods=["POST"])
+def testurl():
+    if(request.method == "POST"):
+        data = request.get_json()
+        name = data['name']
+        email = data['email']
+        response = {
+            'status': 'success',
+            'name': name,
+            'email': email
+        }
+        return jsonify(response)
+
 
 
 

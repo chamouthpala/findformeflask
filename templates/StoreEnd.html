@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StoreEnd</title>
+    <style>
+      /* Add some basic styling to the page */
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f2f2f2;
+      }
+
+      /* Add some styling to the form */
+      form {
+        margin-top: 50px;
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 20px;
+        border: 2px solid #008CBA;
+        border-radius: 10px;
+        box-shadow: 5px 5px 5px #888888;
+        background-color: #FFFFFF;
+      }
+
+      /* Add some styling to the form elements */
+      input[type=text] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+      }
+
+      input[type=select] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+      }
+
+      /* Add some styling to the submit button */
+      input[type=submit] {
+        background-color: #008CBA;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      /* Add some hover effects to the submit button */
+      input[type=submit]:hover {
+        background-color: #006f8a;
+      }
+    </style>
+</head>
+<body>
+<form action="/submit-form" method="post" enctype="multipart/form-data">
+
+
+    <label for="field1">Select Gender:</label>
+      <select id="field1" name="field1" required>
+        <option value="Men">Men</option>
+        <option value="Women">Women</option>
+      </select>
+    </br>
+  <label for="field2">Category:</label>
+  <input type="text" id="field2" name="field2" placeholder="TopWear/Bottomwear....." required><br>
+
+  <label for="field3">Article Type:</label>
+  <input type="text" id="field3" name="field3" placeholder="Shirts/jeans......" required><br>
+
+  <label for="field4">Colour:</label>
+  <input type="text" id="field4" name="field4" required><br>
+
+  <label for="field5">Season:</label>
+  <input type="text" id="field5" name="field5" placeholder="Summer/winter......" required><br>
+
+  <label for="field5">Usage:</label>
+  <input type="text" id="field6" name="field6" placeholder="Casual/formal......." required><br>
+
+  <label for="field7">Product Display Name:</label>
+  <input type="text" id="field7" name="field7" required><br>
+
+  <label for="image">Image Upload:</label>
+  <input type="file" id="image" name="image" required><br>
+
+  <input type="submit" value="Submit">
+</form>
+</body>
+</html>

@@ -1,15 +1,41 @@
 import csv
 import random
 
+
 import werkzeug
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
+# import tensorflow.keras.preprocessing
+from keras.applications.resnet import preprocess_input, ResNet50
+from keras.layers import GlobalMaxPooling2D
+from keras.preprocessing import image
 from sqlalchemy import Column,Integer,String,Float
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager,jwt_required,create_access_token
 import os
+import tensorflow
+import numpy as np
+import pandas as pd
+from PIL import Image
+import pickle
+import joblib
+
+# model related lib
+
+from numpy.linalg import norm
+from tensorflow.python.keras.models import Sequential
+
+features_list = joblib.load("recommandation/image_features_embedding.pkl")
+img_files_list = pickle.load(open("D:/FinalYearProjectFlask/recommandation/img_files.pkl", "rb"))
+
+model = ResNet50(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
+model.trainable = False
+model = Sequential([model, GlobalMaxPooling2D()])
+
+
+base_path = "D:/FinalYearProjectFlask/recommandation"
 
 
 app = Flask(__name__)
@@ -121,9 +147,11 @@ def storeend():
 def uploadimage():
     if(request.method == "POST"):
         imagefile = request.files['image']
-        filename = werkzeug.utils.secure_filename(imagefile.filename)
+        # filename = werkzeug.utils.secure_filename(imagefile.filename)
+        filename = "uploadedimage.jpg"
         imagefile.save("./UploadedImage/" + filename)
         # imagefile.save("./UploadedImage/" + filename)
+        find_simillar_images()
         return jsonify({
             "message": "Image Uploaded Successfully"
         })
@@ -167,6 +195,65 @@ class User(db.Model):
 class UserSchema(ma.Schema):
     class Meta:
         fields = ('id','f_name','l_name','email','password')
+
+
+def find_simillar_images():
+    print("method called")
+    uploaded_file = "D:/FinalYearProjectFlask/UploadedImage/uploadedimage.jpg"
+    if uploaded_file is not None:
+        if save_file(uploaded_file) or True:
+            # display image
+            show_images = Image.open(uploaded_file)
+            size = (400, 400)
+            resized_im = show_images.resize(size)
+            # display(resized_im)
+            # extract features of uploaded image
+            features = extract_img_features(uploaded_file, model)
+            img_indicess = recommendd(features, features_list)
+
+            image1 = img_files_list[img_indicess[0][0]]
+            image2 = img_files_list[img_indicess[0][1]]
+            image3 = img_files_list[img_indicess[0][2]]
+            image4 = img_files_list[img_indicess[0][3]]
+            image5 = img_files_list[img_indicess[0][4]]
+
+            # display(Image.open(os.path.join(base_path, img_files_list[img_indicess[0][0]])))
+            # display(Image.open(os.path.join(base_path, img_files_list[img_indicess[0][1]])))
+            # display(Image.open(os.path.join(base_path, img_files_list[img_indicess[0][2]])))
+            # display(Image.open(os.path.join(base_path, img_files_list[img_indicess[0][3]])))
+            # display(Image.open(os.path.join(base_path, img_files_list[img_indicess[0][4]])))
+            # print(image3)
+        else:
+            print("Some error occur")
+
+
+def save_file(uploaded_file):
+    try:
+        with open(os.path.join("uploader", uploaded_file.name), 'wb') as f:
+            f.write(uploaded_file.getbuffer())
+            return 1
+    except:
+        return 0
+
+def extract_img_features(img_path, model):
+    img = image.load_img(img_path, target_size=(224, 224))
+    img_array = image.img_to_array(img)
+    expand_img = np.expand_dims(img_array, axis=0)
+    preprocessed_img = preprocess_input(expand_img)
+    result_to_resnet = model.predict(preprocessed_img)
+    flatten_result = result_to_resnet.flatten()
+    # normalizing
+    result_normlized = flatten_result / norm(flatten_result)
+
+    return result_normlized
+
+def recommendd(features, features_list):
+    with open('recommandation/Model.pkl', 'rb') as file:
+        knnmodel = pickle.load(file)
+    distence, indices = knnmodel.kneighbors([features])
+
+    return indices
+
 
 
 user_schema = UserSchema()
